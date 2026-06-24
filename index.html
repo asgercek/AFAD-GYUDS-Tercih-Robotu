@@ -161,45 +161,18 @@ th {
     filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));
 }
 .map-container path {
-    stroke: #ffffff;
-    stroke-width: 1.5;
+    stroke: #ffffff !important;
+    stroke-width: 1.5 !important;
     transition: fill 0.3s ease;
 }
 /* Kadrosu Olmayan İller */
-.map-path-disabled { fill: #e2e8f0; cursor: not-allowed; }
+.map-path-disabled { fill: #e2e8f0 !important; cursor: not-allowed; }
 /* Kadrosu Olan Seçilebilir İller */
-.map-path-available { fill: #4299e1; cursor: pointer; }
-.map-path-available:hover { fill: #2b6cb0; }
+.map-path-available { fill: #4299e1 !important; cursor: pointer; }
+.map-path-available:hover { fill: #2b6cb0 !important; }
 /* Kontenjanı Doldurulmuş İller */
-.map-path-full { fill: #f56565; cursor: not-allowed; }
-.map-path-full:hover { fill: #c53030; }
-
-.map-tooltip {
-    position: absolute;
-    background: rgba(26, 54, 93, 0.95);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    pointer-events: none;
-    z-index: 1000;
-    display: none;
-    transform: translate(-50%, -100%);
-    margin-top: -10px;
-    text-align: center;
-    line-height: 1.4;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-.map-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -6px;
-    border-width: 6px;
-    border-style: solid;
-    border-color: rgba(26, 54, 93, 0.95) transparent transparent transparent;
-}
+.map-path-full { fill: #f56565 !important; cursor: not-allowed; }
+.map-path-full:hover { fill: #c53030 !important; }
 
 /* TERCİH KUTUCUKLARI CSS */
 .tercihler-grid {
@@ -600,15 +573,22 @@ function haritayiBoya() {
 
     let paths = document.querySelectorAll('.map-container svg path');
     paths.forEach(p => {
-        let pid = p.id; 
+        // YENİ HARİTA İÇİN AKILLI EŞLEŞTİRME:
+        // İlin adını bulmak için id, data-iladi veya name etiketlerinden hangisi doluysa onu al
+        let hamAd = p.getAttribute('data-iladi') || p.getAttribute('name') || p.id || "";
+        
+        // Bulunan ismi (Örn: "Antalya", "TR-34" veya "TR-Adana") bizim sistemimize uydur
+        let pid = normalizeIl(hamAd.replace("TR-", "")); 
+        
         let kData = mapData[pid];
         
+        // Önceki sınıfları temizle
         p.classList.remove('map-path-disabled', 'map-path-available', 'map-path-full');
         
         if (!kData || kData.kontenjan === 0) {
             p.classList.add('map-path-disabled');
-            let ilAd = kData ? kData.il : p.getAttribute('data-iladi') || pid.toUpperCase();
-            p.dataset.tooltip = `<strong>${ilAd}</strong><br><span style="color:#fca5a5;">Kadro Bulunmuyor</span>`;
+            let gorunenAd = p.getAttribute('data-iladi') || p.getAttribute('name') || hamAd;
+            p.dataset.tooltip = `<strong>${gorunenAd.toUpperCase()}</strong><br><span style="color:#fca5a5;">Kadro Bulunmuyor</span>`;
             p.dataset.kadroId = "";
         } else {
             if (kData.secilenSayisi >= kData.kontenjan) {
@@ -621,7 +601,6 @@ function haritayiBoya() {
         }
     });
 }
-
 // Harita Üzerindeki Tıklama ve Hover Etkileşimleri
 function initMapInteraction() {
     let container = document.querySelector('.map-container');
