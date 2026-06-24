@@ -552,6 +552,7 @@ function haritaVeKutucuklariSenkronizeEt() {
 }
 
 // Sadece Harita Renklerini Günceller
+// Harita Renklerini Günceller (Yeni SVG Yapısına Uygun - <g> Etiketi Bazlı)
 function haritayiBoya() {
     let kadroEl = document.getElementById("kadro");
     if(!kadroEl) return;
@@ -571,23 +572,26 @@ function haritayiBoya() {
         }
     });
 
-    let paths = document.querySelectorAll('.map-container svg path');
-    paths.forEach(p => {
-        // YENİ HARİTA İÇİN AKILLI EŞLEŞTİRME:
-        // İlin adını bulmak için id, data-iladi veya name etiketlerinden hangisi doluysa onu al
-        let hamAd = p.getAttribute('data-iladi') || p.getAttribute('name') || p.id || "";
+    // Artık path'leri değil, onları saran <g> gruplarını seçiyoruz
+    let groups = document.querySelectorAll('.map-container svg g');
+    
+    groups.forEach(g => {
+        // "turkiye" gibi kapsayıcı ana grupları atla
+        if(g.id === "turkiye" || !g.id) return;
         
-        // Bulunan ismi (Örn: "Antalya", "TR-34" veya "TR-Adana") bizim sistemimize uydur
-        let pid = normalizeIl(hamAd.replace("TR-", "")); 
-        
+        let pid = normalizeIl(g.id); 
         let kData = mapData[pid];
         
-        // Önceki sınıfları temizle
+        // Grubun içindeki path'i bul
+        let p = g.querySelector('path');
+        if(!p) return;
+        
         p.classList.remove('map-path-disabled', 'map-path-available', 'map-path-full');
+        
+        let gorunenAd = g.getAttribute('data-iladi') || g.id;
         
         if (!kData || kData.kontenjan === 0) {
             p.classList.add('map-path-disabled');
-            let gorunenAd = p.getAttribute('data-iladi') || p.getAttribute('name') || hamAd;
             p.dataset.tooltip = `<strong>${gorunenAd.toUpperCase()}</strong><br><span style="color:#fca5a5;">Kadro Bulunmuyor</span>`;
             p.dataset.kadroId = "";
         } else {
@@ -601,12 +605,15 @@ function haritayiBoya() {
         }
     });
 }
-// Harita Üzerindeki Tıklama ve Hover Etkileşimleri
+
+// Harita Üzerindeki Tıklama ve Hover Etkileşimleri (Yeni SVG Yapısına Uygun)
 function initMapInteraction() {
     let container = document.querySelector('.map-container');
     let tooltip = document.getElementById('map-tooltip');
     
     container.addEventListener('mousemove', (e) => {
+        // Tıklanan yer path ise, tooltip verisini kendi üzerinden veya bir üstündeki <g> den mi alıyor diye kontrol edeceğiz ama
+        // Yukarıda dataset'i path'e atadığımız için doğrudan alabiliriz.
         if(e.target.tagName === 'path') {
             let dataHtml = e.target.dataset.tooltip;
             if(dataHtml) {
@@ -643,7 +650,6 @@ function initMapInteraction() {
                 return;
             }
 
-            // İlk boş olan Select Kutusunu Bul ve Oraya Ekle
             let eklendi = false;
             for(let i=1; i<=15; i++){
                 let el = document.getElementById("t"+i);
@@ -655,7 +661,6 @@ function initMapInteraction() {
             }
             
             if(eklendi) {
-                // Diziyi ve haritayı yeniden eşitle
                 seciliTercihler = [];
                 for(let i=1; i<=15; i++) {
                     let v = document.getElementById("t"+i).value;
@@ -666,6 +671,7 @@ function initMapInteraction() {
         }
     });
 }
+           
 
 function displayAdaylar(adaylar) {
     let html = "";
