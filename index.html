@@ -6,144 +6,84 @@
 <title>AFAD GYUDS Tercih Robotu</title>
 
 <style>
-* {
-    box-sizing:border-box;
-}
+* { box-sizing: border-box; }
 body {
     font-family: Arial, sans-serif;
-    background:#f4f6f9;
-    margin:0;
-    padding:10px;
-    color:#1f2d3d;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 10px;
+    color: #1f2d3d;
 }
 .container {
-    max-width:1200px;
-    margin:auto;
-    background:white;
-    padding:15px;
-    border-radius:10px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    max-width: 1200px;
+    margin: auto;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-h1 {
-    color:#1a365d;
-    font-size:24px;
-    margin-top:0;
+h1 { color: #1a365d; font-size: 24px; margin-top: 0; }
+h3 { margin-top: 20px; margin-bottom: 10px; color: #1a365d; }
+input, select, button {
+    padding: 12px;
+    margin: 5px 0;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
 }
-h3 {
-    margin-top:20px;
-    margin-bottom:10px;
-    color:#1a365d;
+input:focus, select:focus {
+    outline: none;
+    border-color: #2b6cb0;
+    box-shadow: 0 0 5px rgba(43,108,176,0.3);
 }
-input,select,button {
-    padding:12px;
-    margin:5px 0;
-    width:100%;
-    border:1px solid #ddd;
-    border-radius:4px;
-    font-size:14px;
-}
-input:focus,select:focus {
-    outline:none;
-    border-color:#2b6cb0;
-    box-shadow:0 0 5px rgba(43,108,176,0.3);
-}
-select {
-    background-color:white;
-    cursor:pointer;
-}
-.row {
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:10px;
-}
-.col {
-    flex:1;
-    min-width:250px;
-}
+select { background-color: white; cursor: pointer; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.col { flex: 1; min-width: 250px; }
 button {
-    background:#2b6cb0;
-    color:white;
-    border:none;
-    cursor:pointer;
-    font-weight:bold;
-    margin-top:10px;
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
     transition: background 0.2s;
 }
-button:hover {
-    background:#1e4e86;
-}
-.red {
-    background:#c53030;
-}
-.blue {
-    background:#2b6cb0;
-}
-button:active {
-    opacity:0.8;
-}
-table {
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-    font-size:13px;
-}
-th,td {
-    border:1px solid #ddd;
-    padding:8px;
-    text-align:left;
-}
-th {
-    background:#2b6cb0;
-    color:white;
-    font-weight:bold;
-}
-.bad {
-    background:#ffe5e5;
-}
-.good {
-    background:#e6ffed;
-}
+button:hover { background: #1e4e86; }
+.red { background: #c53030; }
+.blue { background: #2b6cb0; }
+button:active { opacity: 0.8; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background: #2b6cb0; color: white; font-weight: bold; }
+.bad { background: #ffe5e5; }
+.good { background: #e6ffed; }
 .panel {
-    background:#eef3f8;
-    padding:10px;
-    border-radius:8px;
-    margin-top:10px;
-    border-left:4px solid #2b6cb0;
+    background: #eef3f8;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border-left: 4px solid #2b6cb0;
 }
 .status {
-    padding:10px;
-    margin:10px 0;
-    border-radius:5px;
-    display:none;
-    border-left:4px solid;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    display: none;
+    border-left: 4px solid;
 }
-.status.online {
-    background:#e6ffed;
-    color:#22543d;
-    border-color:#22a084;
-    display:block;
-}
-.status.offline {
-    background:#ffe5e5;
-    color:#5c2c2c;
-    border-color:#c53030;
-    display:block;
-}
+.status.online { background: #e6ffed; color: #22543d; border-color: #22a084; display: block; }
+.status.offline { background: #ffe5e5; color: #5c2c2c; border-color: #c53030; display: block; }
 .loading {
-    display:inline-block;
-    width:8px;
-    height:8px;
-    background:#2b6cb0;
-    border-radius:50%;
-    animation:pulse 1.5s infinite;
-    margin-right:8px;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #2b6cb0;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    margin-right: 8px;
 }
-@keyframes pulse {
-    0%{opacity:1;}
-    50%{opacity:0.5;}
-    100%{opacity:1;}
-}
+@keyframes pulse { 0%{opacity:1;} 50%{opacity:0.5;} 100%{opacity:1;} }
 
 /* === HARİTA CSS === */
 .map-container {
@@ -155,92 +95,81 @@ th {
     margin-bottom: 10px;
     overflow: visible;
 }
-.map-container svg {
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));
-}
-.map-container path {
-    stroke: #ffffff !important;
-    stroke-width: 1.5 !important;
-    transition: fill 0.3s ease;
-}
-/* Kadrosu Olmayan İller */
+.map-container svg { width: 100%; height: auto; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1)); }
+.map-container path { stroke: #ffffff !important; stroke-width: 1.5 !important; transition: fill 0.3s ease; }
 .map-path-disabled { fill: #e2e8f0 !important; cursor: not-allowed; }
-/* Kadrosu Olan Seçilebilir İller */
 .map-path-available { fill: #4299e1 !important; cursor: pointer; }
 .map-path-available:hover { fill: #2b6cb0 !important; }
-/* Kontenjanı Doldurulmuş İller */
 .map-path-full { fill: #f56565 !important; cursor: not-allowed; }
 .map-path-full:hover { fill: #c53030 !important; }
 
+.map-tooltip {
+    position: absolute;
+    background: rgba(26, 54, 93, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+    transform: translate(-50%, -100%);
+    margin-top: -10px;
+    text-align: left;
+    line-height: 1.4;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
 /* TERCİH KUTUCUKLARI CSS */
 .tercihler-grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:8px;
-    margin-bottom:15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
 }
-.tercihler-grid select {
-    margin:0;
-    background-color: #fff;
-}
-.tercihler-grid select.dolu {
-    background-color: #ebf8ff;
-    border-color: #90cdf4;
-    font-weight: bold;
-    color: #2b6cb0;
-}
+.tercihler-grid select { margin: 0; background-color: #fff; }
+.tercihler-grid select.dolu { background-color: #ebf8ff; border-color: #90cdf4; font-weight: bold; color: #2b6cb0; }
 
 .candidates-list {
-    max-height:350px;
-    overflow-y:auto;
-    border:1px solid #ddd;
-    padding:10px;
-    margin-top:10px;
-    border-radius:5px;
-    background:#f9f9f9;
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    background: #f9f9f9;
 }
 .candidate-item {
-    background:white;
-    margin:5px 0;
-    border-radius:6px;
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    border-left:4px solid #2b6cb0;
-    box-shadow:0 1px 3px rgba(0,0,0,0.1);
+    background: white;
+    margin: 5px 0;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-left: 4px solid #2b6cb0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 .remove-btn {
-    background:#c53030;
-    color:white;
-    border:none;
-    padding:6px 12px;
-    cursor:pointer;
-    border-radius:4px;
-    font-size:12px;
-    width:auto;
-    margin:0;
+    background: #c53030;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+    width: auto;
+    margin: 0;
 }
-.remove-btn:hover { background:#a02020; }
-.empty-message { color:#999; text-align:center; padding:20px; font-style:italic; }
+.remove-btn:hover { background: #a02020; }
+.empty-message { color: #999; text-align: center; padding: 20px; font-style: italic; }
 
 @media (max-width:768px){
-    .container { padding:10px; }
-    h1 { font-size:20px; }
-    .col { min-width:100%; }
-    .tercihler-grid { grid-template-columns:repeat(2,1fr); }
-    table { font-size:12px; }
-    th,td { padding:6px; }
-}
-
-@media (max-width:480px){
-    .container { padding:8px; }
-    h1 { font-size:18px; }
-    input,select,button { padding:10px; font-size:16px; }
-    .tercihler-grid { grid-template-columns:1fr; }
-    table { font-size:11px; }
-    th,td { padding:4px; }
+    .container { padding: 10px; }
+    h1 { font-size: 20px; }
+    .col { min-width: 100%; }
+    .tercihler-grid { grid-template-columns: repeat(2, 1fr); }
+    table { font-size: 12px; }
+    th, td { padding: 6px; }
 }
 </style>
 </head>
@@ -377,7 +306,6 @@ th {
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <script>
-// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAM23MI8-lVOhKTXCTefCm3nkz4Bj5vtLo",
     authDomain: "afad-gyud-tercih-robotu.firebaseapp.com",
@@ -389,11 +317,10 @@ const firebaseConfig = {
     measurementId: "G-J65P02HN3R"
 };
 
-// Global Değişkenler
 let db;
 let adaylarRef;
 let aktifDuzenlemeKey = null;
-let seciliTercihler = []; // Anlık tercih listesi
+let seciliTercihler = [];
 
 try {
     firebase.initializeApp(firebaseConfig);
@@ -403,7 +330,6 @@ try {
     console.error("Firebase başlatma hatası:", e);
 }
 
-// Türkçe karakterleri SVG ID'leri ile eşleştirme fonksiyonu
 function normalizeIl(il) {
     const map = {
         'Ç':'c', 'Ğ':'g', 'I':'i', 'İ':'i', 'Ö':'o', 'Ş':'s', 'Ü':'u',
@@ -427,14 +353,12 @@ function updateStatus(online) {
 }
 
 function init(){
-    // 1. Önce 15 Tercih Kutucuğunu Oluştur
     let kadroElement = document.getElementById("kadro");
     let tercihlerDiv = document.getElementById("tercihler"); 
     
     if (kadroElement && tercihlerDiv) {
         try {
             let kadrolar = JSON.parse(kadroElement.value.trim());
-            // Harf sırasına göre diz (Kutucuklardaki görünüm için)
             kadrolar.sort((a,b) => a.il.localeCompare(b.il, 'tr')); 
             
             let html = "";
@@ -451,21 +375,12 @@ function init(){
         }
     }
 
-    // 2. Haritayı Yükle (Hata kontrollü)
     let haritaURL = 'turkiye.svg';
     
     fetch(haritaURL)
-    .then(async r => {
-        if (!r.ok) throw new Error("Ağ hatası veya dosya bulunamadı: " + r.status);
-        
-        let text = await r.text();
-        
-        // JSDelivr'ın SVG yerine düz hata metni döndürmesine karşı güvenlik filtresi:
-        if (text.includes("Failed to fetch") || text.includes("404:") || !text.includes("<svg")) {
-            throw new Error("Geçerli bir SVG dosyası alınamadı.");
-        }
-        
-        return text;
+    .then(r => {
+        if (!r.ok) throw new Error("Dosya bulunamadı: " + r.status);
+        return r.text();
     })
     .then(svgText => {
         let wrapper = document.getElementById('svg-wrapper');
@@ -481,11 +396,9 @@ function init(){
         document.getElementById('svg-wrapper').innerHTML = 
             "<div style='background:#ffe5e5; color:#c53030; padding: 20px; border-radius: 8px; border: 1px solid #fc8181;'>" +
             "<strong>🗺️ Harita Yüklenemedi!</strong><br><br>" +
-            "Harita SVG dosyasına ulaşılamıyor. Lütfen harita linkini kontrol edin veya projeye yerel bir 'turkiye.svg' ekleyin.<br>" +
-            "<i>Sistem çalışmaya devam ediyor, tercihlerinizi aşağıdaki açılır listelerden yapabilirsiniz.</i></div>";
+            "Projedeki yerel 'turkiye.svg' dosyası okunamadı. Tercihlerinizi aşağıdaki listelerden yapabilirsiniz.</div>";
     });
 
-    // 3. Firebase Dinleyicileri
     if (typeof firebase !== 'undefined' && db && adaylarRef) {
         db.ref('.info/connected').on('value', snap => updateStatus(snap.val() === true));
         adaylarRef.on('value', snapshot => displayAdaylar(snapshot.val() || {}));
@@ -496,12 +409,10 @@ function init(){
     listeGuncelle();
 }
 
-// Tercih Kutucuklarından Birisi Manuel Değiştirildiğinde Çalışır
 function kutucukDegisti(index) {
     let el = document.getElementById("t" + index);
     let secilenId = el.value;
     
-    // Kontenjan Limit Kontrolü
     if (secilenId) {
         let kadrolar = JSON.parse(document.getElementById("kadro").value.trim());
         let kData = kadrolar.find(x => x.id === secilenId);
@@ -513,11 +424,10 @@ function kutucukDegisti(index) {
         
         if (kData && secimSayisi > kData.kontenjan) {
             alert(`📌 ${kData.il} ili için ayrılan maksimum kontenjanı (${kData.kontenjan}) aştınız!`);
-            el.value = ""; // Hatalı seçimi geri al
+            el.value = "";
         }
     }
     
-    // Geçerli kutucukları toplayıp haritayı boyatır
     seciliTercihler = [];
     let sayac = 0;
     for(let i=1; i<=15; i++) {
@@ -534,9 +444,7 @@ function kutucukDegisti(index) {
     haritayiBoya();
 }
 
-// Harita ile Kutucukları Eşzamanlı Günceller
 function haritaVeKutucuklariSenkronizeEt() {
-    // 1. Select Kutucuklarını Doldur
     for(let i=1; i<=15; i++) {
         let el = document.getElementById("t"+i);
         if(el) {
@@ -546,9 +454,9 @@ function haritaVeKutucuklariSenkronizeEt() {
         }
     }
     document.getElementById("tercihSayaci").innerText = seciliTercihler.length;
-    
-  // Harita Renklerini Günceller (Çoklu Parça ve Sabit Başlık Desteğiyle)
-    
+    haritayiBoya();
+}
+
 function haritayiBoya() {
     let kadroEl = document.getElementById("kadro");
     if(!kadroEl) return;
@@ -573,26 +481,19 @@ function haritayiBoya() {
     groups.forEach(g => {
         if(g.id === "turkiye" || !g.id) return;
         
-        // İlin adını bul
         let hamAd = g.getAttribute('data-iladi') || g.getAttribute('name') || g.id || "";
         let pid = normalizeIl(hamAd.replace("TR-", "")); 
         let kData = mapData[pid];
         let gorunenAd = g.getAttribute('data-iladi') || hamAd;
         
-        // ÇÖZÜM 1: Sadece ilk path'i değil, ile ait TÜM path'leri (adalar dahil) bul ve dön
         let paths = g.querySelectorAll('path');
         
         paths.forEach(p => {
             p.classList.remove('map-path-disabled', 'map-path-available', 'map-path-full');
             
-            // ÇÖZÜM 2: Sabit Başlıkları ve İstenen Formatı Ekle
             if (!kData || kData.kontenjan === 0) {
                 p.classList.add('map-path-disabled');
-                // Kadrosu olmayanlar için
-                p.dataset.tooltip = `
-                    İl Adı: <strong>${gorunenAd.toUpperCase()}</strong><br>
-                    Şube Müdürü Kadro Sayısı: 0<br>
-                    Tercih Sayısı: 0`;
+                p.dataset.tooltip = `İl Adı: <strong>${gorunenAd.toUpperCase()}</strong><br>Şube Müdürü Kadro Sayısı: 0<br>Tercih Sayısı: 0`;
                 p.dataset.kadroId = "";
             } else {
                 if (kData.secilenSayisi >= kData.kontenjan) {
@@ -600,25 +501,18 @@ function haritayiBoya() {
                 } else {
                     p.classList.add('map-path-available');
                 }
-                // Kadrosu olanlar için
-                p.dataset.tooltip = `
-                    İl Adı: <strong style="color:#90cdf4;">${kData.il}</strong><br>
-                    Şube Müdürü Kadro Sayısı: ${kData.kontenjan}<br>
-                    Tercih Sayısı: ${kData.secilenSayisi}`;
+                p.dataset.tooltip = `İl Adı: <strong style="color:#90cdf4;">${kData.il}</strong><br>Şube Müdürü Kadro Sayısı: ${kData.kontenjan}<br>Tercih Sayısı: ${kData.secilenSayisi}`;
                 p.dataset.kadroId = kData.id;
             }
         });
     });
 }
 
-// Harita Üzerindeki Tıklama ve Hover Etkileşimleri (Yeni SVG Yapısına Uygun)
 function initMapInteraction() {
     let container = document.querySelector('.map-container');
     let tooltip = document.getElementById('map-tooltip');
     
     container.addEventListener('mousemove', (e) => {
-        // Tıklanan yer path ise, tooltip verisini kendi üzerinden veya bir üstündeki <g> den mi alıyor diye kontrol edeceğiz ama
-        // Yukarıda dataset'i path'e atadığımız için doğrudan alabiliriz.
         if(e.target.tagName === 'path') {
             let dataHtml = e.target.dataset.tooltip;
             if(dataHtml) {
@@ -676,7 +570,6 @@ function initMapInteraction() {
         }
     });
 }
-           
 
 function displayAdaylar(adaylar) {
     let html = "";
@@ -723,7 +616,6 @@ function kaydet(){
     if(!isim){ alert("Lütfen ad girin"); return; }
     if(isNaN(puan) || puan < 0 || puan > 100){ alert("Lütfen geçerli bir puan girin (0-100)"); return; }
     
-    // Kutulardan son değerleri çek
     seciliTercihler = [];
     for(let i=1; i<=15; i++) {
         let v = document.getElementById("t"+i).value;
@@ -780,6 +672,7 @@ function duzenleModunaGec(key) {
     }
 }
 
+// ... (adayiSil, formuTemizle, listeGuncelle ve calistir fonksiyonları aynen korunmuştur)
 function adayiSil(key) {
     if(confirm("Bu kaydı tamamen silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")){
         if(adaylarRef) {
@@ -803,7 +696,7 @@ function formuTemizle() {
     
     aktifDuzenlemeKey = null;
     let islemBtn = document.getElementById("islemButonu");
-    islemBtn.innerText = "✅ Aday Ekle";
+    islemBtn.innerText = "✅ Aday Ekle / Kaydet";
     islemBtn.className = "";
     document.getElementById("iptalButonu").style.display = "none";
 }
