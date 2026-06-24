@@ -26,6 +26,7 @@ input,select,button{
     padding:10px;
     margin:5px 0;
     width:100%;
+    box-sizing:border-box;
 }
 .row{display:flex;gap:10px;flex-wrap:wrap;}
 .col{flex:1;min-width:250px;}
@@ -38,6 +39,7 @@ button{
 }
 button:hover{background:#1e4e86;}
 .red{background:#c53030;}
+.blue{background:#2b6cb0;}
 table{
     width:100%;
     border-collapse:collapse;
@@ -58,6 +60,63 @@ th{background:#2b6cb0;color:white;}
     border-radius:8px;
     margin-top:10px;
 }
+.status{
+    padding:10px;
+    margin:10px 0;
+    border-radius:5px;
+    display:none;
+}
+.status.online{
+    background:#e6ffed;
+    color:#22543d;
+    display:block;
+}
+.status.offline{
+    background:#ffe5e5;
+    color:#5c2c2c;
+    display:block;
+}
+.loading{
+    display:inline-block;
+    width:10px;
+    height:10px;
+    background:#2b6cb0;
+    border-radius:50%;
+    animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+    0%{opacity:1;}
+    50%{opacity:0.5;}
+    100%{opacity:1;}
+}
+.candidates-list{
+    max-height:300px;
+    overflow-y:auto;
+    border:1px solid #ddd;
+    padding:10px;
+    margin-top:10px;
+    border-radius:5px;
+}
+.candidate-item{
+    padding:8px;
+    background:#f0f0f0;
+    margin:5px 0;
+    border-radius:3px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.remove-btn{
+    background:#c53030;
+    color:white;
+    border:none;
+    padding:3px 8px;
+    cursor:pointer;
+    border-radius:3px;
+    font-size:12px;
+    width:auto;
+}
+.remove-btn:hover{background:#a02020;}
 </style>
 </head>
 
@@ -65,8 +124,13 @@ th{background:#2b6cb0;color:white;}
 <div class="container">
 <h1>AFAD GYUDS Şube Müdürü Yerleştirme Simülasyonu</h1>
 
+<div id="status" class="status">
+    <span class="loading"></span> <span id="statusText">Bağlantı kontrol ediliyor...</span>
+</div>
+
 <div class="panel">
 <strong>Sistem:</strong> Puan sıralı, kontenjan bazlı deterministik yerleştirme modeli çalışmaktadır.
+<br><strong>Cloud:</strong> Tüm adaylar Firebase'de saklanmaktadır. Birden fazla cihazdan eşzamanlı erişim sağlanır.
 </div>
 
 <div class="row">
@@ -82,7 +146,11 @@ th{background:#2b6cb0;color:white;}
 <div id="tercihler"></div>
 
 <button onclick="adayEkle()">Aday Ekle</button>
+<button class="blue" onclick="listeGuncelle()">Listeyi Yenile</button>
 <button class="red" onclick="calistir()">Simülasyonu Çalıştır</button>
+
+<h3>Eklenen Adaylar</h3>
+<div class="candidates-list" id="adaylarListesi"></div>
 
 <h3>Sonuçlar</h3>
 <table>
@@ -170,10 +238,41 @@ th{background:#2b6cb0;color:white;}
 {"id":"SM_66","il":"ZONGULDAK","kontenjan":3}
 ]</textarea>
 
-<textarea id="adaylar" style="display:none;">[]</textarea>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
 
 <script>
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAM23MI8-lVOhKTXCTefCm3nkz4Bj5vtLo",
+  authDomain: "afad-gyud-tercih-robotu.firebaseapp.com",
+  databaseURL: "https://afad-gyud-tercih-robotu-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "afad-gyud-tercih-robotu",
+  storageBucket: "afad-gyud-tercih-robotu.firebasestorage.app",
+  messagingSenderId: "929411560493",
+  appId: "1:929411560493:web:c73a9044650a039dbc74a4",
+  measurementId: "G-J65P02HN3R"
+};
+
+// Firebase Başlat
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const adaylarRef = db.ref('adaylar');
+
 let tercihlerDiv = document.getElementById("tercihler");
+
+function updateStatus(online) {
+    let statusDiv = document.getElementById("status");
+    let statusText = document.getElementById("statusText");
+    if(online){
+        statusDiv.className = "status online";
+        statusText.textContent = "🟢 Firebase'ye bağlı";
+    } else {
+        statusDiv.className = "status offline";
+        statusText.textContent = "🔴 Bağlantı kesildi (çevrimdışı mod)";
+    }
+}
 
 function init(){
     let kadrolar = JSON.parse(document.getElementById("kadro").value);
@@ -186,74 +285,146 @@ function init(){
         html += "</select>";
     }
     tercihlerDiv.innerHTML = html;
+    
+    // Firebase bağlantı kontrolü
+    db.ref('.info/connected').on('value', (snap) => {
+        updateStatus(snap.val() === true);
+    });
+    
+    // Gerçek zamanlı aday güncellemeleri dinle
+    adaylarRef.on('value', (snapshot) => {
+        displayAdaylar(snapshot.val() || {});
+    });
+    
+    listeGuncelle();
+}
+
+function displayAdaylar(adaylar) {
+    let html = "";
+    Object.keys(adaylar).forEach(key => {
+        let aday = adaylar[key];
+        html += `<div class="candidate-item">
+            <span><strong>${aday.isim}</strong> - ${aday.puan} puan</span>
+            <button class="remove-btn" onclick="adayiSil('${key}')">Sil</button>
+        </div>`;
+    });
+    document.getElementById("adaylarListesi").innerHTML = html || "<p style='color:#999;'>Henüz aday eklenmedi</p>";
 }
 
 function adayEkle(){
     let isim=document.getElementById("isim").value;
     let puan=parseFloat(document.getElementById("puan").value);
+    
+    if(!isim || !puan){
+        alert("Lütfen ad ve puan girin");
+        return;
+    }
+    
     let tercihler=[];
-
     for(let i=1;i<=15;i++){
         let v=document.getElementById("t"+i).value;
-        if(v)tercihler.push(v);
+        if(v) tercihler.push(v);
+    }
+    
+    if(tercihler.length === 0){
+        alert("Lütfen en az bir tercih seçin");
+        return;
     }
 
-    let arr=JSON.parse(document.getElementById("adaylar").value);
-    arr.push({isim,puan,tercihler});
-    document.getElementById("adaylar").value=JSON.stringify(arr);
+    // Firebase'e kaydet (otomatik ID ile)
+    adaylarRef.push({
+        isim: isim,
+        puan: puan,
+        tercihler: tercihler,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+        // Formu temizle
+        document.getElementById("isim").value = "";
+        document.getElementById("puan").value = "";
+        for(let i=1;i<=15;i++){
+            document.getElementById("t"+i).value = "";
+        }
+        alert("Aday başarıyla eklendi");
+    }).catch((error) => {
+        alert("Hata: " + error.message);
+    });
+}
 
-    alert("Aday eklendi");
+function adayiSil(key) {
+    if(confirm("Bu adayı silmek istediğinizden emin misiniz?")){
+        adaylarRef.child(key).remove().then(() => {
+            alert("Aday silindi");
+        }).catch((error) => {
+            alert("Hata: " + error.message);
+        });
+    }
+}
+
+function listeGuncelle(){
+    adaylarRef.once('value', (snapshot) => {
+        displayAdaylar(snapshot.val() || {});
+    });
 }
 
 function calistir(){
-    let kadrolar=JSON.parse(document.getElementById("kadro").value);
-    let adaylar=JSON.parse(document.getElementById("adaylar").value);
-
-    let map={};
-    kadrolar.forEach(k=>map[k.id]={...k,kalan:k.kontenjan});
-
-    adaylar.sort((a,b)=>b.puan-a.puan);
-
-    let sonuc=[];
-
-    adaylar.forEach(a=>{
-        let durum=false;
-        let il="";
-        let tercih=0;
-
-        for(let i=0;i<a.tercihler.length;i++){
-            let k=map[a.tercihler[i]];
-            if(k && k.kalan>0){
-                k.kalan--;
-                durum=true;
-                il=k.il;
-                tercih=i+1;
-                break;
-            }
+    adaylarRef.once('value', (snapshot) => {
+        let kadrolar=JSON.parse(document.getElementById("kadro").value);
+        let adaylarObj = snapshot.val() || {};
+        
+        // Objeden diziye dönüştür
+        let adaylar = Object.values(adaylarObj);
+        
+        if(adaylar.length === 0){
+            alert("Lütfen en az bir aday ekleyin");
+            return;
         }
 
-        sonuc.push({a,durum,il,tercih});
+        let map={};
+        kadrolar.forEach(k=>map[k.id]={...k,kalan:k.kontenjan});
+
+        adaylar.sort((a,b)=>b.puan-a.puan);
+
+        let sonuc=[];
+
+        adaylar.forEach(a=>{
+            let durum=false;
+            let il="";
+            let tercih=0;
+
+            for(let i=0;i<a.tercihler.length;i++){
+                let k=map[a.tercihler[i]];
+                if(k && k.kalan>0){
+                    k.kalan--;
+                    durum=true;
+                    il=k.il;
+                    tercih=i+1;
+                    break;
+                }
+            }
+
+            sonuc.push({a,durum,il,tercih});
+        });
+
+        let html="";
+        sonuc.forEach((s,i)=>{
+            html+=`<tr class="${s.durum?'good':'bad'}">
+            <td>${i+1}</td>
+            <td>${s.a.isim}</td>
+            <td>${s.a.puan}</td>
+            <td>${s.il||'-'}</td>
+            <td>${s.durum?'Yerleşti':'Yerleşemedi'}</td>
+            <td>${s.tercih||'-'}</td>
+            </tr>`;
+        });
+
+        document.getElementById("sonuc").innerHTML=html;
+
+        let total=sonuc.length;
+        let ok=sonuc.filter(x=>x.durum).length;
+
+        document.getElementById("istatistik").innerHTML=
+        `<strong>Sonuçlar:</strong> Toplam Aday: ${total} | Yerleşen: ${ok} | Boşta: ${total-ok} | Başarı Oranı: %${(ok/total*100).toFixed(2)}`;
     });
-
-    let html="";
-    sonuc.forEach((s,i)=>{
-        html+=`<tr class="${s.durum?'good':'bad'}">
-        <td>${i+1}</td>
-        <td>${s.a.isim}</td>
-        <td>${s.a.puan}</td>
-        <td>${s.il||'-'}</td>
-        <td>${s.durum?'Yerleşti':'Yerleşemedi'}</td>
-        <td>${s.tercih||'-'}</td>
-        </tr>`;
-    });
-
-    document.getElementById("sonuc").innerHTML=html;
-
-    let total=sonuc.length;
-    let ok=sonuc.filter(x=>x.durum).length;
-
-    document.getElementById("istatistik").innerHTML=
-    `Toplam Aday: ${total} | Yerleşen: ${ok} | Boşta: ${total-ok}`;
 }
 
 window.onload=init;
