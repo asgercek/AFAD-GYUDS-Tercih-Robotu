@@ -454,6 +454,88 @@ function updateStatus(online) {
     }
 }
 
+function loadMap() {
+    // Fallback: Basit SVG haritasını doğrudan ekle
+    const simpleSVG = `<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg" style="background: #e3f2fd;">
+        <g id="map-group">
+            <path id="adana" data-iladi="ADANA" d="M 650 580 L 680 570 L 690 600 L 660 610 Z"/>
+            <path id="adiyaman" data-iladi="ADIYAMAN" d="M 600 480 L 630 475 L 635 505 L 605 510 Z"/>
+            <path id="afyon" data-iladi="AFYONKARAHİSAR" d="M 450 450 L 480 445 L 485 475 L 455 480 Z"/>
+            <path id="aksaray" data-iladi="AKSARAY" d="M 550 420 L 580 415 L 585 445 L 555 450 Z"/>
+            <path id="amasya" data-iladi="AMASYA" d="M 520 320 L 550 315 L 555 345 L 525 350 Z"/>
+            <path id="antalya" data-iladi="ANTALYA" d="M 520 580 L 550 575 L 555 605 L 525 610 Z"/>
+            <path id="ardahan" data-iladi="ARDAHAN" d="M 680 200 L 710 195 L 715 225 L 685 230 Z"/>
+            <path id="artvin" data-iladi="ARTVİN" d="M 700 180 L 730 175 L 735 205 L 705 210 Z"/>
+            <path id="aydin" data-iladi="AYDIN" d="M 380 480 L 410 475 L 415 505 L 385 510 Z"/>
+            <path id="balikesir" data-iladi="BALIKESİR" d="M 350 380 L 380 375 L 385 405 L 355 410 Z"/>
+            <path id="bartin" data-iladi="BARTIN" d="M 480 280 L 510 275 L 515 305 L 485 310 Z"/>
+            <path id="bayburt" data-iladi="BAYBURT" d="M 570 280 L 600 275 L 605 305 L 575 310 Z"/>
+            <path id="bilecik" data-iladi="BİLECİK" d="M 420 380 L 450 375 L 455 405 L 425 410 Z"/>
+            <path id="bitlis" data-iladi="BİTLİS" d="M 680 380 L 710 375 L 715 405 L 685 410 Z"/>
+            <path id="bolu" data-iladi="BOLU" d="M 450 320 L 480 315 L 485 345 L 455 350 Z"/>
+            <path id="burdur" data-iladi="BURDUR" d="M 480 520 L 510 515 L 515 545 L 485 550 Z"/>
+            <path id="canakkale" data-iladi="ÇANAKKALE" d="M 280 300 L 310 295 L 315 325 L 285 330 Z"/>
+            <path id="corum" data-iladi="ÇORUM" d="M 500 300 L 530 295 L 535 325 L 505 330 Z"/>
+            <path id="denizli" data-iladi="DENİZLİ" d="M 420 500 L 450 495 L 455 525 L 425 530 Z"/>
+            <path id="diyarbakir" data-iladi="DİYARBAKIR" d="M 680 450 L 710 445 L 715 475 L 685 480 Z"/>
+            <path id="duzce" data-iladi="DÜZCE" d="M 440 280 L 470 275 L 475 305 L 445 310 Z"/>
+            <path id="edirne" data-iladi="EDİRNE" d="M 280 200 L 310 195 L 315 225 L 285 230 Z"/>
+            <path id="elaziz" data-iladi="ELAZIĞ" d="M 630 380 L 660 375 L 665 405 L 635 410 Z"/>
+            <path id="erzincan" data-iladi="ERZİNCAN" d="M 600 320 L 630 315 L 635 345 L 605 350 Z"/>
+            <path id="erzurum" data-iladi="ERZURUM" d="M 650 250 L 680 245 L 685 275 L 655 280 Z"/>
+            <path id="giresun" data-iladi="GİRESUN" d="M 570 260 L 600 255 L 605 285 L 575 290 Z"/>
+            <path id="hakkari" data-iladi="HAKKARİ" d="M 720 420 L 750 415 L 755 445 L 725 450 Z"/>
+            <path id="hatay" data-iladi="HATAY" d="M 640 620 L 670 615 L 675 645 L 645 650 Z"/>
+            <path id="igdir" data-iladi="IĞDIR" d="M 700 240 L 730 235 L 735 265 L 705 270 Z"/>
+            <path id="isparta" data-iladi="ISPARTA" d="M 480 540 L 510 535 L 515 565 L 485 570 Z"/>
+            <path id="istanbul" data-iladi="İSTANBUL" d="M 310 240 L 340 235 L 345 265 L 315 270 Z"/>
+            <path id="izmir" data-iladi="İZMİR" d="M 350 430 L 380 425 L 385 455 L 355 460 Z"/>
+            <path id="kahramanmaras" data-iladi="KAHRAMANMARAŞ" d="M 620 540 L 650 535 L 655 565 L 625 570 Z"/>
+            <path id="karabuk" data-iladi="KARABÜK" d="M 480 260 L 510 255 L 515 285 L 485 290 Z"/>
+            <path id="kars" data-iladi="KARS" d="M 720 200 L 750 195 L 755 225 L 725 230 Z"/>
+            <path id="kastamonu" data-iladi="KASTAMONU" d="M 470 260 L 500 255 L 505 285 L 475 290 Z"/>
+            <path id="kayseri" data-iladi="KAYSERİ" d="M 580 380 L 610 375 L 615 405 L 585 410 Z"/>
+            <path id="kirikkale" data-iladi="KIRIKKALE" d="M 500 380 L 530 375 L 535 405 L 505 410 Z"/>
+            <path id="kirklareli" data-iladi="KIRKLARELİ" d="M 320 220 L 350 215 L 355 245 L 325 250 Z"/>
+            <path id="kilis" data-iladi="KİLİS" d="M 660 590 L 690 585 L 695 615 L 665 620 Z"/>
+            <path id="kocaeli" data-iladi="KOCAELİ" d="M 380 260 L 410 255 L 415 285 L 385 290 Z"/>
+            <path id="kutahya" data-iladi="KÜTAHYA" d="M 400 420 L 430 415 L 435 445 L 405 450 Z"/>
+            <path id="malatya" data-iladi="MALATYA" d="M 630 340 L 660 335 L 665 365 L 635 370 Z"/>
+            <path id="manisa" data-iladi="MANİSA" d="M 380 410 L 410 405 L 415 435 L 385 440 Z"/>
+            <path id="mardin" data-iladi="MARDİN" d="M 720 500 L 750 495 L 755 525 L 725 530 Z"/>
+            <path id="mersin" data-iladi="MERSİN" d="M 600 600 L 630 595 L 635 625 L 605 630 Z"/>
+            <path id="mugla" data-iladi="MUĞLA" d="M 420 540 L 450 535 L 455 565 L 425 570 Z"/>
+            <path id="mus" data-iladi="MUŞ" d="M 700 340 L 730 335 L 735 365 L 705 370 Z"/>
+            <path id="nevsehir" data-iladi="NEVŞEHİR" d="M 550 440 L 580 435 L 585 465 L 555 470 Z"/>
+            <path id="nigde" data-iladi="NİĞDE" d="M 570 460 L 600 455 L 605 485 L 575 490 Z"/>
+            <path id="ordu" data-iladi="ORDU" d="M 540 260 L 570 255 L 575 285 L 545 290 Z"/>
+            <path id="osmaniye" data-iladi="OSMANİYE" d="M 660 560 L 690 555 L 695 585 L 665 590 Z"/>
+            <path id="rize" data-iladi="RİZE" d="M 600 220 L 630 215 L 635 245 L 605 250 Z"/>
+            <path id="sakarya" data-iladi="SAKARYA" d="M 410 300 L 440 295 L 445 325 L 415 330 Z"/>
+            <path id="siirt" data-iladi="SİİRT" d="M 710 480 L 740 475 L 745 505 L 715 510 Z"/>
+            <path id="sinop" data-iladi="SİNOP" d="M 510 240 L 540 235 L 545 265 L 515 270 Z"/>
+            <path id="sanliurfa" data-iladi="ŞANLIURFA" d="M 680 520 L 710 515 L 715 545 L 685 550 Z"/>
+            <path id="sirnak" data-iladi="ŞIRNAK" d="M 760 460 L 790 455 L 795 485 L 765 490 Z"/>
+            <path id="tekirdag" data-iladi="TEKİRDAĞ" d="M 290 260 L 320 255 L 325 285 L 295 290 Z"/>
+            <path id="trabzon" data-iladi="TRABZON" d="M 600 200 L 630 195 L 635 225 L 605 230 Z"/>
+            <path id="tunceli" data-iladi="TUNCELİ" d="M 620 340 L 650 335 L 655 365 L 625 370 Z"/>
+            <path id="usak" data-iladi="UŞAK" d="M 420 460 L 450 455 L 455 485 L 425 490 Z"/>
+            <path id="van" data-iladi="VAN" d="M 760 380 L 790 375 L 795 405 L 765 410 Z"/>
+            <path id="yalova" data-iladi="YALOVA" d="M 360 280 L 390 275 L 395 305 L 365 310 Z"/>
+            <path id="yozgat" data-iladi="YOZGAT" d="M 530 380 L 560 375 L 565 405 L 535 410 Z"/>
+            <path id="zonguldak" data-iladi="ZONGULDAK" d="M 430 240 L 460 235 L 465 265 L 435 270 Z"/>
+        </g>
+    </svg>`;
+    
+    let wrapper = document.getElementById('svg-wrapper');
+    if(wrapper) {
+        wrapper.innerHTML = simpleSVG;
+        wrapper.style.padding = "0";
+        haritaVeKutucuklariSenkronizeEt();
+        initMapInteraction();
+    }
+}
+
 function init(){
     // 1. Önce 15 Tercih Kutucuğunu Oluştur
     let kadroElement = document.getElementById("kadro");
@@ -479,21 +561,8 @@ function init(){
         }
     }
 
-    // 2. Haritayı JSDelivr CDN'den Yükle (Daha güvenilir bağlantı)
-    fetch('https://cdn.jsdelivr.net/gh/dnomak/turkiye-svg@master/turkiye.svg')
-    .then(r => r.text())
-    .then(svgText => {
-        let wrapper = document.getElementById('svg-wrapper');
-        if(wrapper) {
-            wrapper.innerHTML = svgText;
-            wrapper.style.padding = "0"; 
-            haritaVeKutucuklariSenkronizeEt();
-            initMapInteraction();
-        }
-    })
-    .catch(err => {
-        document.getElementById('svg-wrapper').innerHTML = "<p style='color:#c53030;'>Harita yüklenemedi. Lütfen tercihlerinizi aşağıdaki kutucuklardan yapınız.</p>";
-    });
+    // 2. Haritayı Yükle
+    loadMap();
 
     // 3. Firebase Dinleyicileri
     if (typeof firebase !== 'undefined' && db && adaylarRef) {
