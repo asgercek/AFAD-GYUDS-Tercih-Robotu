@@ -548,11 +548,7 @@ function haritaVeKutucuklariSenkronizeEt() {
     document.getElementById("tercihSayaci").innerText = seciliTercihler.length;
     
     // 2. Haritayı Boya
-    haritayiBoya();
-}
-
-// Sadece Harita Renklerini Günceller
-// Harita Renklerini Günceller (Yeni SVG Yapısına Uygun - <g> Etiketi Bazlı)
+    // Harita Renklerini Günceller (Çoklu Parça ve Sabit Başlık Desteğiyle)
 function haritayiBoya() {
     let kadroEl = document.getElementById("kadro");
     if(!kadroEl) return;
@@ -572,39 +568,46 @@ function haritayiBoya() {
         }
     });
 
-    // Artık path'leri değil, onları saran <g> gruplarını seçiyoruz
     let groups = document.querySelectorAll('.map-container svg g');
     
     groups.forEach(g => {
-        // "turkiye" gibi kapsayıcı ana grupları atla
         if(g.id === "turkiye" || !g.id) return;
         
-       // Haritayı çizenin olası ID hatalarını (typo) ezmek için önce gerçek ada bakıyoruz:
-let hamAd = g.getAttribute('data-iladi') || g.getAttribute('name') || g.id || "";
-let pid = normalizeIl(hamAd.replace("TR-", ""));
+        // İlin adını bul
+        let hamAd = g.getAttribute('data-iladi') || g.getAttribute('name') || g.id || "";
+        let pid = normalizeIl(hamAd.replace("TR-", "")); 
         let kData = mapData[pid];
+        let gorunenAd = g.getAttribute('data-iladi') || hamAd;
         
-        // Grubun içindeki path'i bul
-        let p = g.querySelector('path');
-        if(!p) return;
+        // ÇÖZÜM 1: Sadece ilk path'i değil, ile ait TÜM path'leri (adalar dahil) bul ve dön
+        let paths = g.querySelectorAll('path');
         
-        p.classList.remove('map-path-disabled', 'map-path-available', 'map-path-full');
-        
-        let gorunenAd = g.getAttribute('data-iladi') || g.id;
-        
-        if (!kData || kData.kontenjan === 0) {
-            p.classList.add('map-path-disabled');
-            p.dataset.tooltip = `<strong>${gorunenAd.toUpperCase()}</strong><br><span style="color:#fca5a5;">Kadro Bulunmuyor</span>`;
-            p.dataset.kadroId = "";
-        } else {
-            if (kData.secilenSayisi >= kData.kontenjan) {
-                p.classList.add('map-path-full');
+        paths.forEach(p => {
+            p.classList.remove('map-path-disabled', 'map-path-available', 'map-path-full');
+            
+            // ÇÖZÜM 2: Sabit Başlıkları ve İstenen Formatı Ekle
+            if (!kData || kData.kontenjan === 0) {
+                p.classList.add('map-path-disabled');
+                // Kadrosu olmayanlar için
+                p.dataset.tooltip = `
+                    İl Adı: <strong>${gorunenAd.toUpperCase()}</strong><br>
+                    Şube Müdürü Kadro Sayısı: 0<br>
+                    Tercih Sayısı: 0`;
+                p.dataset.kadroId = "";
             } else {
-                p.classList.add('map-path-available');
+                if (kData.secilenSayisi >= kData.kontenjan) {
+                    p.classList.add('map-path-full');
+                } else {
+                    p.classList.add('map-path-available');
+                }
+                // Kadrosu olanlar için
+                p.dataset.tooltip = `
+                    İl Adı: <strong style="color:#90cdf4;">${kData.il}</strong><br>
+                    Şube Müdürü Kadro Sayısı: ${kData.kontenjan}<br>
+                    Tercih Sayısı: ${kData.secilenSayisi}`;
+                p.dataset.kadroId = kData.id;
             }
-            p.dataset.tooltip = `<strong style="font-size:15px;color:#90cdf4;">${kData.il}</strong><br>Şube Müdürü Kadrosu: ${kData.kontenjan}<br>Listenizdeki Sayı: ${kData.secilenSayisi}`;
-            p.dataset.kadroId = kData.id;
-        }
+        });
     });
 }
 
