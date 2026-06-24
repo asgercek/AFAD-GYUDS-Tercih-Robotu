@@ -470,17 +470,26 @@ function displayAdaylar(adaylar) {
             let butonHtml = "";
             if (yetkiliMi) {
                 butonHtml = `
-                <div style="margin-top:10px; padding-top:10px; border-top:1px solid #eee; width:100%;">
-                    <button class="blue" style="padding:6px 12px; width:auto; font-size:12px;" onclick="duzenleModunaGec('${key}')">✏️ Düzenle</button>
-                    <button class="remove-btn" style="padding:6px 12px; margin-left:5px;" onclick="adayiSil('${key}')">🗑️ Sil</button>
+                <div style="margin-top:10px; padding-top:10px; border-top:1px solid #eee; width:100%; display:flex; gap:5px;">
+                    <button class="blue" style="padding:6px 12px; width:auto; font-size:12px; margin:0;" onclick="duzenleModunaGec('${key}')">✏️ Düzenle</button>
+                    <button class="remove-btn" style="padding:6px 12px; margin:0;" onclick="adayiSil('${key}')">🗑️ Sil</button>
                 </div>`;
             }
 
-            html += `<div class="candidate-item" style="flex-direction:column; align-items:flex-start;">
-                <div style="display:flex; justify-content:space-between; width:100%;">
-                    <strong>${aday.isim}</strong>
-                    <span style="font-size:14px; font-weight:bold; color:#2b6cb0;">${aday.puan} Puan</span>
+            html += `<div class="candidate-item" style="flex-direction:column; align-items:flex-start; padding:12px;">
+                
+                <div style="display:flex; gap:10px; width:100%;">
+                    
+                    <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 12px; border-radius:6px; display:flex; align-items:center;">
+                        <strong style="color:#1a365d; margin:0; font-size:14px;">👤 ${aday.isim}</strong>
+                    </div>
+                    
+                    <div style="background:#ebf8ff; border:1px solid #bee3f8; padding:8px 15px; border-radius:6px; display:flex; align-items:center; justify-content:center; white-space:nowrap;">
+                        <span style="font-size:14px; font-weight:bold; color:#2b6cb0;">🎯 ${aday.puan} Puan</span>
+                    </div>
+
                 </div>
+
                 ${butonHtml}
             </div>`;
         });
