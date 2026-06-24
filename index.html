@@ -579,7 +579,9 @@ function haritayiBoya() {
         // "turkiye" gibi kapsayıcı ana grupları atla
         if(g.id === "turkiye" || !g.id) return;
         
-        let pid = normalizeIl(g.id); 
+       // Haritayı çizenin olası ID hatalarını (typo) ezmek için önce gerçek ada bakıyoruz:
+let hamAd = g.getAttribute('data-iladi') || g.getAttribute('name') || g.id || "";
+let pid = normalizeIl(hamAd.replace("TR-", ""));
         let kData = mapData[pid];
         
         // Grubun içindeki path'i bul
