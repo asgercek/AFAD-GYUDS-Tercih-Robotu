@@ -27,6 +27,18 @@ input,select,button{
     margin:5px 0;
     width:100%;
     box-sizing:border-box;
+    font-size:14px;
+}
+select{
+    background-color:white;
+    border:1px solid #ddd;
+    border-radius:4px;
+    cursor:pointer;
+}
+select:focus{
+    outline:none;
+    border-color:#2b6cb0;
+    box-shadow:0 0 5px rgba(43,108,176,0.3);
 }
 .row{display:flex;gap:10px;flex-wrap:wrap;}
 .col{flex:1;min-width:250px;}
@@ -117,6 +129,12 @@ th{background:#2b6cb0;color:white;}
     width:auto;
 }
 .remove-btn:hover{background:#a02020;}
+#tercihler{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:10px;
+    margin-bottom:15px;
+}
 </style>
 </head>
 
