@@ -68,6 +68,7 @@ button {
     cursor:pointer;
     font-weight:bold;
     margin-top:10px;
+    transition: background 0.2s;
 }
 button:hover {
     background:#1e4e86;
@@ -143,6 +144,64 @@ th {
     50%{opacity:0.5;}
     100%{opacity:1;}
 }
+
+/* === HARİTA CSS === */
+.map-container {
+    position: relative;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    overflow: visible;
+}
+.map-container svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));
+}
+.map-container path {
+    stroke: #ffffff;
+    stroke-width: 1.5;
+    transition: fill 0.3s ease;
+}
+/* Kadrosu Olmayan İller */
+.map-path-disabled { fill: #e2e8f0; cursor: not-allowed; }
+/* Kadrosu Olan Seçilebilir İller */
+.map-path-available { fill: #4299e1; cursor: pointer; }
+.map-path-available:hover { fill: #2b6cb0; }
+/* Kontenjanı Doldurulmuş İller */
+.map-path-full { fill: #f56565; cursor: not-allowed; }
+.map-path-full:hover { fill: #c53030; }
+
+.map-tooltip {
+    position: absolute;
+    background: rgba(26, 54, 93, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+    transform: translate(-50%, -100%);
+    margin-top: -10px;
+    text-align: center;
+    line-height: 1.4;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.map-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(26, 54, 93, 0.95) transparent transparent transparent;
+}
+
+/* TERCİH KUTUCUKLARI CSS */
 .tercihler-grid {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
@@ -151,9 +210,17 @@ th {
 }
 .tercihler-grid select {
     margin:0;
+    background-color: #fff;
 }
+.tercihler-grid select.dolu {
+    background-color: #ebf8ff;
+    border-color: #90cdf4;
+    font-weight: bold;
+    color: #2b6cb0;
+}
+
 .candidates-list {
-    max-height:300px;
+    max-height:350px;
     overflow-y:auto;
     border:1px solid #ddd;
     padding:10px;
@@ -162,23 +229,14 @@ th {
     background:#f9f9f9;
 }
 .candidate-item {
-    padding:10px;
     background:white;
     margin:5px 0;
-    border-radius:4px;
+    border-radius:6px;
     display:flex;
-    justify-content:space-between;
-    align-items:center;
+    flex-direction:column;
+    align-items:flex-start;
     border-left:4px solid #2b6cb0;
-    font-size:14px;
-}
-.candidate-item span {
-    flex:1;
-}
-.candidate-item strong {
-    display:block;
-    color:#1a365d;
-    margin-bottom:3px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.1);
 }
 .remove-btn {
     background:#c53030;
@@ -186,71 +244,30 @@ th {
     border:none;
     padding:6px 12px;
     cursor:pointer;
-    border-radius:3px;
+    border-radius:4px;
     font-size:12px;
     width:auto;
     margin:0;
-    white-space:nowrap;
 }
-.remove-btn:hover {
-    background:#a02020;
-}
-.empty-message {
-    color:#999;
-    text-align:center;
-    padding:20px;
-    font-style:italic;
-}
+.remove-btn:hover { background:#a02020; }
+.empty-message { color:#999; text-align:center; padding:20px; font-style:italic; }
 
 @media (max-width:768px){
-    .container {
-        padding:10px;
-    }
-    h1 {
-        font-size:20px;
-    }
-    .col {
-        min-width:100%;
-    }
-    .tercihler-grid {
-        grid-template-columns:repeat(2,1fr);
-    }
-    table {
-        font-size:12px;
-    }
-    th,td {
-        padding:6px;
-    }
+    .container { padding:10px; }
+    h1 { font-size:20px; }
+    .col { min-width:100%; }
+    .tercihler-grid { grid-template-columns:repeat(2,1fr); }
+    table { font-size:12px; }
+    th,td { padding:6px; }
 }
 
 @media (max-width:480px){
-    .container {
-        padding:8px;
-    }
-    h1 {
-        font-size:18px;
-    }
-    input,select,button {
-        padding:10px;
-        font-size:16px;
-    }
-    .tercihler-grid {
-        grid-template-columns:1fr;
-    }
-    .candidate-item {
-        flex-direction:column;
-        align-items:flex-start;
-    }
-    .remove-btn {
-        margin-left:0;
-        margin-top:8px;
-    }
-    table {
-        font-size:11px;
-    }
-    th,td {
-        padding:4px;
-    }
+    .container { padding:8px; }
+    h1 { font-size:18px; }
+    input,select,button { padding:10px; font-size:16px; }
+    .tercihler-grid { grid-template-columns:1fr; }
+    table { font-size:11px; }
+    th,td { padding:4px; }
 }
 </style>
 </head>
@@ -278,10 +295,18 @@ th {
 </div>
 </div>
 
-<h3>📝 Tercihler (En az 1, en fazla 15)</h3>
+<h3>🗺️ Haritadan veya Listeden Seçim Yapın</h3>
+<div class="map-container">
+    <div id="map-tooltip" class="map-tooltip"></div>
+    <div id="svg-wrapper" style="text-align: center; padding: 20px;">
+        <span class="loading"></span> Türkiye Haritası Yükleniyor...
+    </div>
+</div>
+
+<h3>📝 Tercihleriniz (<span id="tercihSayaci">0</span> / 15)</h3>
 <div class="tercihler-grid" id="tercihler"></div>
 
-<button id="islemButonu" onclick="kaydet()">✅ Aday Ekle</button>
+<button id="islemButonu" onclick="kaydet()">✅ Adayı Ekle / Kaydet</button>
 <button id="iptalButonu" onclick="formuTemizle()" style="display:none; background:#718096;">❌ Güncellemeyi İptal Et</button>
 <button class="blue" onclick="listeGuncelle()">🔄 Listeyi Yenile</button>
 <button class="red" onclick="calistir()">▶️ Simülasyonu Çalıştır</button>
@@ -298,7 +323,7 @@ th {
 <th>Puan</th>
 <th>İl</th>
 <th>Durum</th>
-<th>Tercih</th>
+<th>Tercih Sırası</th>
 </tr>
 </thead>
 <tbody id="sonuc"></tbody>
@@ -306,6 +331,7 @@ th {
 
 <div class="panel" id="istatistik"></div>
 
+<!-- Gizli Kadro JSON Verisi -->
 <textarea id="kadro" style="display:none;">[
 {"id":"SM_01","il":"ADANA","kontenjan":3},
 {"id":"SM_02","il":"ADIYAMAN","kontenjan":2},
@@ -391,10 +417,11 @@ const firebaseConfig = {
     measurementId: "G-J65P02HN3R"
 };
 
-// Firebase Başlat
+// Global Değişkenler
 let db;
 let adaylarRef;
 let aktifDuzenlemeKey = null;
+let seciliTercihler = []; // Anlık tercih listesi
 
 try {
     firebase.initializeApp(firebaseConfig);
@@ -402,6 +429,15 @@ try {
     adaylarRef = db.ref('adaylar');
 } catch (e) {
     console.error("Firebase başlatma hatası:", e);
+}
+
+// Türkçe karakterleri SVG ID'leri ile eşleştirme fonksiyonu
+function normalizeIl(il) {
+    const map = {
+        'Ç':'c', 'Ğ':'g', 'I':'i', 'İ':'i', 'Ö':'o', 'Ş':'s', 'Ü':'u',
+        'ç':'c', 'ğ':'g', 'ı':'i', 'i':'i', 'ö':'o', 'ş':'s', 'ü':'u'
+    };
+    return il.replace(/[ÇĞIİÖŞÜçğıiöşü]/g, match => map[match]).toLowerCase().trim();
 }
 
 function updateStatus(online) {
@@ -419,40 +455,220 @@ function updateStatus(online) {
 }
 
 function init(){
-    // DÜZELTME BURADA: DOM elementleri fonksiyon içinde tanımlanarak hata önleniyor.
+    // 1. Önce 15 Tercih Kutucuğunu Oluştur
     let kadroElement = document.getElementById("kadro");
     let tercihlerDiv = document.getElementById("tercihler"); 
     
     if (kadroElement && tercihlerDiv) {
         try {
             let kadrolar = JSON.parse(kadroElement.value.trim());
+            // Harf sırasına göre diz (Kutucuklardaki görünüm için)
+            kadrolar.sort((a,b) => a.il.localeCompare(b.il, 'tr')); 
+            
             let html = "";
             for(let i=1; i<=15; i++){
-                html += `<select id="t${i}"><option value="">Tercih ${i}</option>`;
-                kadrolar.forEach(k=>{
-                    html += `<option value="${k.id}">${k.il}</option>`;
+                html += `<select id="t${i}" onchange="kutucukDegisti(${i})"><option value="">Tercih ${i} ...</option>`;
+                kadrolar.forEach(k => {
+                    html += `<option value="${k.id}">${k.il} (Kontenjan: ${k.kontenjan})</option>`;
                 });
                 html += "</select>";
             }
             tercihlerDiv.innerHTML = html;
         } catch (e) {
-            console.error("Kadro JSON verisi ayrıştırılamadı:", e);
+            console.error("Kadro JSON hatası:", e);
         }
     }
-    
+
+    // 2. Haritayı JSDelivr CDN'den Yükle (Daha güvenilir bağlantı)
+    fetch('https://cdn.jsdelivr.net/gh/dnomak/turkiye-svg@master/turkiye.svg')
+    .then(r => r.text())
+    .then(svgText => {
+        let wrapper = document.getElementById('svg-wrapper');
+        if(wrapper) {
+            wrapper.innerHTML = svgText;
+            wrapper.style.padding = "0"; 
+            haritaVeKutucuklariSenkronizeEt();
+            initMapInteraction();
+        }
+    })
+    .catch(err => {
+        document.getElementById('svg-wrapper').innerHTML = "<p style='color:#c53030;'>Harita yüklenemedi. Lütfen tercihlerinizi aşağıdaki kutucuklardan yapınız.</p>";
+    });
+
+    // 3. Firebase Dinleyicileri
     if (typeof firebase !== 'undefined' && db && adaylarRef) {
-        db.ref('.info/connected').on('value', (snap) => {
-            updateStatus(snap.val() === true);
-        });
-        
-        adaylarRef.on('value', (snapshot) => {
-            displayAdaylar(snapshot.val() || {});
-        });
+        db.ref('.info/connected').on('value', snap => updateStatus(snap.val() === true));
+        adaylarRef.on('value', snapshot => displayAdaylar(snapshot.val() || {}));
     } else {
         updateStatus(false);
     }
     
     listeGuncelle();
+}
+
+// Tercih Kutucuklarından Birisi Manuel Değiştirildiğinde Çalışır
+function kutucukDegisti(index) {
+    let el = document.getElementById("t" + index);
+    let secilenId = el.value;
+    
+    // Kontenjan Limit Kontrolü
+    if (secilenId) {
+        let kadrolar = JSON.parse(document.getElementById("kadro").value.trim());
+        let kData = kadrolar.find(x => x.id === secilenId);
+        
+        let secimSayisi = 0;
+        for(let i=1; i<=15; i++) {
+            if(document.getElementById("t"+i).value === secilenId) secimSayisi++;
+        }
+        
+        if (kData && secimSayisi > kData.kontenjan) {
+            alert(`📌 ${kData.il} ili için ayrılan maksimum kontenjanı (${kData.kontenjan}) aştınız!`);
+            el.value = ""; // Hatalı seçimi geri al
+        }
+    }
+    
+    // Geçerli kutucukları toplayıp haritayı boyatır
+    seciliTercihler = [];
+    let sayac = 0;
+    for(let i=1; i<=15; i++) {
+        let selectEl = document.getElementById("t"+i);
+        if(selectEl.value) {
+            seciliTercihler.push(selectEl.value);
+            selectEl.classList.add("dolu");
+            sayac++;
+        } else {
+            selectEl.classList.remove("dolu");
+        }
+    }
+    document.getElementById("tercihSayaci").innerText = sayac;
+    haritayiBoya();
+}
+
+// Harita ile Kutucukları Eşzamanlı Günceller
+function haritaVeKutucuklariSenkronizeEt() {
+    // 1. Select Kutucuklarını Doldur
+    for(let i=1; i<=15; i++) {
+        let el = document.getElementById("t"+i);
+        if(el) {
+            el.value = seciliTercihler[i-1] || "";
+            if(el.value) el.classList.add("dolu");
+            else el.classList.remove("dolu");
+        }
+    }
+    document.getElementById("tercihSayaci").innerText = seciliTercihler.length;
+    
+    // 2. Haritayı Boya
+    haritayiBoya();
+}
+
+// Sadece Harita Renklerini Günceller
+function haritayiBoya() {
+    let kadroEl = document.getElementById("kadro");
+    if(!kadroEl) return;
+    let kadrolar = JSON.parse(kadroEl.value.trim());
+    let mapData = {}; 
+    
+    kadrolar.forEach(k => {
+        let normalized = normalizeIl(k.il);
+        mapData[normalized] = {...k, secilenSayisi: 0};
+    });
+
+    seciliTercihler.forEach(tId => {
+        let k = kadrolar.find(x => x.id === tId);
+        if(k) {
+            let norm = normalizeIl(k.il);
+            if(mapData[norm]) mapData[norm].secilenSayisi++;
+        }
+    });
+
+    let paths = document.querySelectorAll('.map-container svg path');
+    paths.forEach(p => {
+        let pid = p.id; 
+        let kData = mapData[pid];
+        
+        p.classList.remove('map-path-disabled', 'map-path-available', 'map-path-full');
+        
+        if (!kData || kData.kontenjan === 0) {
+            p.classList.add('map-path-disabled');
+            let ilAd = kData ? kData.il : p.getAttribute('data-iladi') || pid.toUpperCase();
+            p.dataset.tooltip = `<strong>${ilAd}</strong><br><span style="color:#fca5a5;">Kadro Bulunmuyor</span>`;
+            p.dataset.kadroId = "";
+        } else {
+            if (kData.secilenSayisi >= kData.kontenjan) {
+                p.classList.add('map-path-full');
+            } else {
+                p.classList.add('map-path-available');
+            }
+            p.dataset.tooltip = `<strong style="font-size:15px;color:#90cdf4;">${kData.il}</strong><br>Şube Müdürü Kadrosu: ${kData.kontenjan}<br>Listenizdeki Sayı: ${kData.secilenSayisi}`;
+            p.dataset.kadroId = kData.id;
+        }
+    });
+}
+
+// Harita Üzerindeki Tıklama ve Hover Etkileşimleri
+function initMapInteraction() {
+    let container = document.querySelector('.map-container');
+    let tooltip = document.getElementById('map-tooltip');
+    
+    container.addEventListener('mousemove', (e) => {
+        if(e.target.tagName === 'path') {
+            let dataHtml = e.target.dataset.tooltip;
+            if(dataHtml) {
+                tooltip.innerHTML = dataHtml;
+                tooltip.style.display = 'block';
+                let rect = container.getBoundingClientRect();
+                tooltip.style.left = (e.clientX - rect.left + 15) + 'px';
+                tooltip.style.top = (e.clientY - rect.top - 15) + 'px';
+            }
+        } else {
+            tooltip.style.display = 'none';
+        }
+    });
+    
+    container.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+
+    container.addEventListener('click', (e) => {
+        if(e.target.tagName === 'path') {
+            let kadroId = e.target.dataset.kadroId;
+            if(!kadroId) return; 
+            
+            let kadrolar = JSON.parse(document.getElementById("kadro").value.trim());
+            let kData = kadrolar.find(x => x.id === kadroId);
+            if(!kData) return;
+
+            let secilenSayisi = seciliTercihler.filter(id => id === kadroId).length;
+            
+            if (seciliTercihler.length >= 15) {
+                alert("Maksimum tercih limitine (15) ulaştınız.");
+                return;
+            }
+            if (secilenSayisi >= kData.kontenjan) {
+                alert(`📌 ${kData.il} için ayrılan maksimum ${kData.kontenjan} kişilik kontenjan tercih hakkınızı doldurdunuz.`);
+                return;
+            }
+
+            // İlk boş olan Select Kutusunu Bul ve Oraya Ekle
+            let eklendi = false;
+            for(let i=1; i<=15; i++){
+                let el = document.getElementById("t"+i);
+                if(!el.value) {
+                    el.value = kadroId;
+                    eklendi = true;
+                    break;
+                }
+            }
+            
+            if(eklendi) {
+                // Diziyi ve haritayı yeniden eşitle
+                seciliTercihler = [];
+                for(let i=1; i<=15; i++) {
+                    let v = document.getElementById("t"+i).value;
+                    if(v) seciliTercihler.push(v);
+                }
+                haritaVeKutucuklariSenkronizeEt();
+            }
+        }
+    });
 }
 
 function displayAdaylar(adaylar) {
@@ -470,26 +686,21 @@ function displayAdaylar(adaylar) {
             let butonHtml = "";
             if (yetkiliMi) {
                 butonHtml = `
-                <div style="margin-top:10px; padding-top:10px; border-top:1px solid #eee; width:100%; display:flex; gap:5px;">
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid #edf2f7; width:100%; display:flex; gap:8px;">
                     <button class="blue" style="padding:6px 12px; width:auto; font-size:12px; margin:0;" onclick="duzenleModunaGec('${key}')">✏️ Düzenle</button>
                     <button class="remove-btn" style="padding:6px 12px; margin:0;" onclick="adayiSil('${key}')">🗑️ Sil</button>
                 </div>`;
             }
 
-            html += `<div class="candidate-item" style="flex-direction:column; align-items:flex-start; padding:12px;">
-                
-                <div style="display:flex; gap:10px; width:100%;">
-                    
-                    <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 12px; border-radius:6px; display:flex; align-items:center;">
+            html += `<div class="candidate-item" style="padding:15px;">
+                <div style="display:flex; gap:10px; width:100%; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:180px; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:6px; display:flex; align-items:center;">
                         <strong style="color:#1a365d; margin:0; font-size:14px;">👤 ${aday.isim}</strong>
                     </div>
-                    
-                    <div style="background:#ebf8ff; border:1px solid #bee3f8; padding:8px 15px; border-radius:6px; display:flex; align-items:center; justify-content:center; white-space:nowrap;">
+                    <div style="background:#ebf8ff; border:1px solid #bee3f8; padding:10px 15px; border-radius:6px; display:flex; align-items:center; justify-content:center; white-space:nowrap;">
                         <span style="font-size:14px; font-weight:bold; color:#2b6cb0;">🎯 ${aday.puan} Puan</span>
                     </div>
-
                 </div>
-
                 ${butonHtml}
             </div>`;
         });
@@ -502,68 +713,42 @@ function kaydet(){
     let isim = document.getElementById("isim").value.trim();
     let puan = parseFloat(document.getElementById("puan").value);
     
-    if(!isim){
-        alert("Lütfen ad girin");
-        return;
-    }
+    if(!isim){ alert("Lütfen ad girin"); return; }
+    if(isNaN(puan) || puan < 0 || puan > 100){ alert("Lütfen geçerli bir puan girin (0-100)"); return; }
     
-    if(isNaN(puan) || puan < 0 || puan > 100){
-        alert("Lütfen geçerli bir puan girin (0-100)");
-        return;
-    }
-    
-    let tercihler = [];
-    for(let i=1; i<=15; i++){
-        let el = document.getElementById("t"+i);
-        if(el && el.value) {
-            tercihler.push(el.value);
-        }
-    }
-    
-    if(tercihler.length === 0){
-        alert("Lütfen en az bir tercih seçin");
-        return;
+    // Kutulardan son değerleri çek
+    seciliTercihler = [];
+    for(let i=1; i<=15; i++) {
+        let v = document.getElementById("t"+i).value;
+        if(v) seciliTercihler.push(v);
     }
 
-    if (!adaylarRef) {
-        alert("❌ Firebase bağlantısı aktif değil!");
-        return;
-    }
+    if(seciliTercihler.length === 0){ alert("Lütfen haritadan veya listeden en az bir tercih seçin"); return; }
+    if (!adaylarRef) { alert("❌ Firebase bağlantısı aktif değil!"); return; }
 
     if (aktifDuzenlemeKey) {
         adaylarRef.child(aktifDuzenlemeKey).update({
-            isim: isim,
-            puan: puan,
-            tercihler: tercihler,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
+            isim: isim, puan: puan, tercihler: seciliTercihler, timestamp: firebase.database.ServerValue.TIMESTAMP
         }).then(() => {
             alert("✅ Kayıt başarıyla güncellendi!");
             formuTemizle();
-        }).catch((error) => {
-            alert("❌ Hata: " + error.message);
-        });
+        }).catch(error => alert("❌ Hata: " + error.message));
         
     } else {
         let yeniKayitRef = adaylarRef.push();
         let yeniKey = yeniKayitRef.key;
 
         yeniKayitRef.set({
-            isim: isim,
-            puan: puan,
-            tercihler: tercihler,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
+            isim: isim, puan: puan, tercihler: seciliTercihler, timestamp: firebase.database.ServerValue.TIMESTAMP
         }).then(() => {
             let benimKayitlarim = JSON.parse(localStorage.getItem('benimKayitlarim') || '[]');
             if(!benimKayitlarim.includes(yeniKey)) {
                 benimKayitlarim.push(yeniKey);
                 localStorage.setItem('benimKayitlarim', JSON.stringify(benimKayitlarim));
             }
-            
             alert("✅ Aday başarıyla eklendi!");
             formuTemizle();
-        }).catch((error) => {
-            alert("❌ Hata: " + error.message);
-        });
+        }).catch(error => alert("❌ Hata: " + error.message));
     }
 }
 
@@ -575,18 +760,13 @@ function duzenleModunaGec(key) {
                 document.getElementById("isim").value = aday.isim;
                 document.getElementById("puan").value = aday.puan;
                 
-                for(let i=1; i<=15; i++) {
-                    let el = document.getElementById("t"+i);
-                    if(el) {
-                        el.value = aday.tercihler[i-1] || "";
-                    }
-                }
+                seciliTercihler = aday.tercihler || [];
+                haritaVeKutucuklariSenkronizeEt(); 
                 
                 aktifDuzenlemeKey = key;
                 document.getElementById("islemButonu").innerText = "💾 Değişiklikleri Kaydet";
                 document.getElementById("islemButonu").className = "blue";
                 document.getElementById("iptalButonu").style.display = "inline-block";
-                
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
@@ -603,9 +783,7 @@ function adayiSil(key) {
                 
                 alert("✅ Kayıt silindi.");
                 if(aktifDuzenlemeKey === key) formuTemizle();
-            }).catch((error) => {
-                alert("❌ Hata: " + error.message);
-            });
+            }).catch(error => alert("❌ Hata: " + error.message));
         }
     }
 }
@@ -613,10 +791,9 @@ function adayiSil(key) {
 function formuTemizle() {
     document.getElementById("isim").value = "";
     document.getElementById("puan").value = "";
-    for(let i=1; i<=15; i++){
-        let el = document.getElementById("t"+i);
-        if(el) el.value = "";
-    }
+    seciliTercihler = []; 
+    haritaVeKutucuklariSenkronizeEt(); 
+    
     aktifDuzenlemeKey = null;
     let islemBtn = document.getElementById("islemButonu");
     islemBtn.innerText = "✅ Aday Ekle";
@@ -625,11 +802,7 @@ function formuTemizle() {
 }
 
 function listeGuncelle(){
-    if(adaylarRef) {
-        adaylarRef.once('value', (snapshot) => {
-            displayAdaylar(snapshot.val() || {});
-        });
-    }
+    if(adaylarRef) adaylarRef.once('value', snapshot => displayAdaylar(snapshot.val() || {}));
 }
 
 function calistir(){
@@ -637,60 +810,39 @@ function calistir(){
         adaylarRef.once('value', (snapshot) => {
             let kadrolar=JSON.parse(document.getElementById("kadro").value);
             let adaylarObj = snapshot.val() || {};
-            
             let adaylar = Object.values(adaylarObj);
             
-            if(adaylar.length === 0){
-                alert("Lütfen en az bir aday ekleyin");
-                return;
-            }
+            if(adaylar.length === 0){ alert("Lütfen en az bir aday ekleyin"); return; }
 
             let map={};
             kadrolar.forEach(k=>map[k.id]={...k,kalan:k.kontenjan});
-
             adaylar.sort((a,b)=>b.puan-a.puan);
-
             let sonuc=[];
 
             adaylar.forEach(a=>{
-                let durum=false;
-                let il="";
-                let tercih=0;
-
+                let durum=false; let il=""; let tercih=0;
                 for(let i=0;i<a.tercihler.length;i++){
                     let k=map[a.tercihler[i]];
                     if(k && k.kalan>0){
-                        k.kalan--;
-                        durum=true;
-                        il=k.il;
-                        tercih=i+1;
-                        break;
+                        k.kalan--; durum=true; il=k.il; tercih=i+1; break;
                     }
                 }
-
                 sonuc.push({a,durum,il,tercih});
             });
 
             let html="";
             sonuc.forEach((s,i)=>{
                 html+=`<tr class="${s.durum?'good':'bad'}">
-                <td>${i+1}</td>
-                <td>${s.a.isim}</td>
-                <td>${s.a.puan}</td>
-                <td>${s.il||'-'}</td>
-                <td>${s.durum?'✅ Yerleşti':'❌ Yerleşemedi'}</td>
-                <td>${s.tercih||'-'}</td>
-                </tr>`;
+                <td>${i+1}</td><td>${s.a.isim}</td><td>${s.a.puan}</td>
+                <td>${s.il||'-'}</td><td>${s.durum?'✅ Yerleşti':'❌ Yerleşemedi'}</td>
+                <td>${s.tercih||'-'}</td></tr>`;
             });
-
             document.getElementById("sonuc").innerHTML=html;
 
             let total=sonuc.length;
             let ok=sonuc.filter(x=>x.durum).length;
             let oran = total > 0 ? (ok/total*100).toFixed(1) : 0;
-
-            document.getElementById("istatistik").innerHTML=
-            `<strong>📈 Sonuçlar:</strong> Toplam: ${total} | Yerleşen: ${ok} | Boşta: ${total-ok} | Başarı: %${oran}`;
+            document.getElementById("istatistik").innerHTML= `<strong>📈 Sonuçlar:</strong> Toplam: ${total} | Yerleşen: ${ok} | Boşta: ${total-ok} | Başarı: %${oran}`;
         });
     }
 }
